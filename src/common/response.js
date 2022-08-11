@@ -53,10 +53,12 @@ class Response {
             res.cookie("access-token", this._httpCookie, {
                 maxAge: 365 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
+                sameSite: "none",
+                secure: true,
             });
         }
         if (this._clearCookie) {
-            res.clearCookie(this._clearCookie)
+            res.clearCookie(this._clearCookie);
         }
         res.status(this._statusCode).send({
             message: this._message,
