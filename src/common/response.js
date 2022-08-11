@@ -47,6 +47,12 @@ class Response {
     _data;
     _httpCookie;
     _clearCookie;
+    _cookieOptions = {
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+    };
 
     send(res) {
         if (this._httpCookie !== undefined) {
@@ -58,7 +64,7 @@ class Response {
             });
         }
         if (this._clearCookie) {
-            res.clearCookie(this._clearCookie);
+            res.clearCookie(this._clearCookie, this._cookieOptions);
         }
         res.status(this._statusCode).send({
             message: this._message,
