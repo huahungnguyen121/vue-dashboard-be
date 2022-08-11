@@ -27,7 +27,7 @@ export default class App {
 
     constructor() {
         this._app = express();
-        this._port = 5000;
+        this._port = AppConstants.PORT;
         this._corsOption = {
             origin: AppConstants.CLIENT_URLS,
             methods: ["GET", "POST", "PUT", "DELETE"],

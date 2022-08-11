@@ -6,4 +6,8 @@ export default class AppConstants {
     static get CLIENT_URLS() {
         return process.env.CLIENT_URLS.split(",") || "*";
     }
+
+    static get PORT() {
+        return process.env.PORT || 5000;
+    }
 }
