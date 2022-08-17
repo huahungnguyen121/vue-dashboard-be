@@ -4,6 +4,7 @@ import cors from "cors";
 import loggingMiddleware from "./middlewares/global/logging-middleware.js";
 import routers from "./routers/index.js";
 import AppConstants from "./constants/app-constants.js";
+import { connectMongo } from "./connections/db/mongo-db.js";
 
 export default class App {
     _app;
@@ -46,11 +47,21 @@ export default class App {
         this.initMiddlewares();
 
         this.initRouters();
+
+        this.initDB();
+    }
+
+    async initDB() {
+        try {
+            await connectMongo();
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     launchApp() {
         this._app.listen(this._port, () =>
-            console.log(`Express app is listening on port ${this._port}`)
+            console.log(`App is listening on port ${this._port}`)
         );
     }
 }

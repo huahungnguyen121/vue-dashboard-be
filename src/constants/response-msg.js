@@ -26,4 +26,12 @@ export default class ResponseMSG {
     static get LOGOUT_SUCCESS() {
         return "Logout successfully";
     }
+
+    static get REGISTER_SUCCESS() {
+        return "Register successfully";
+    }
+
+    static get USERNAME_EXISTED() {
+        return "Username existed";
+    }
 }

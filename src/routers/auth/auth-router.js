@@ -14,6 +14,7 @@ export default class AuthRouter extends BaseRouter {
 
     initRouter() {
         this._router.post("/login", this.handleLogin);
+        this._router.post("/register", this.handleRegister);
         this._router.delete("/logout", verifyAccessToken, this.handleLogout);
     }
 
@@ -30,28 +31,35 @@ export default class AuthRouter extends BaseRouter {
                 .send(res);
         }
 
-        const [found, info] = await AuthModel.find({ username, password });
+        try {
+            const [found, info] = await AuthModel.find({ username, password });
 
-        if (found === null) {
+            if (found === null) {
+                return responseBuilder
+                    .setStatusCode(400)
+                    .setMessage(ResponseMSG.INVALID_USERNAME)
+                    .getResponse()
+                    .send(res);
+            }
+
+            const accessToken = generateAccessToken({ username: info });
+
+            const result = found
+                ? { status: 200, data: { message: ResponseMSG.OK } }
+                : {
+                      status: 400,
+                      data: { message: ResponseMSG.WRONG_PASSWORD },
+                  };
+
             return responseBuilder
-                .setStatusCode(400)
-                .setMessage(ResponseMSG.INVALID_USERNAME)
+                .setStatusCode(result.status)
+                .setMessage(result.data.message)
+                .setHttpCookie(accessToken)
                 .getResponse()
                 .send(res);
+        } catch (err) {
+            console.error(err);
         }
-
-        const accessToken = generateAccessToken({ username: info });
-
-        const result = found
-            ? { status: 200, data: { message: ResponseMSG.OK } }
-            : { status: 400, data: { message: ResponseMSG.WRONG_PASSWORD } };
-
-        return responseBuilder
-            .setStatusCode(result.status)
-            .setMessage(result.data.message)
-            .setHttpCookie(accessToken)
-            .getResponse()
-            .send(res);
     }
 
     handleLogout(req, res) {
@@ -62,5 +70,39 @@ export default class AuthRouter extends BaseRouter {
             .setMessage(ResponseMSG.LOGOUT_SUCCESS)
             .getResponse()
             .send(res);
+    }
+
+    async handleRegister(req, res) {
+        const { username, password } = req.body;
+
+        const responseBuilder = new ResponseBuilder();
+
+        if (username === undefined || password === undefined) {
+            return responseBuilder
+                .setStatusCode(400)
+                .setMessage(ResponseMSG.BAD_REQUEST)
+                .getResponse()
+                .send(res);
+        }
+
+        try {
+            const createdUser = await AuthModel.create({ username, password });
+
+            if (createdUser === null) {
+                return responseBuilder
+                    .setStatusCode(400)
+                    .setMessage(ResponseMSG.USERNAME_EXISTED)
+                    .getResponse()
+                    .send(res);
+            }
+
+            return responseBuilder
+                .setStatusCode(201)
+                .setMessage(ResponseMSG.REGISTER_SUCCESS)
+                .getResponse()
+                .send(res);
+        } catch (err) {
+            console.error(err);
+        }
     }
 }

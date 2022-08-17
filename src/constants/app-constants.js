@@ -10,4 +10,12 @@ export default class AppConstants {
     static get PORT() {
         return process.env.PORT || 5000;
     }
+
+    static get MONGO_DB_URL() {
+        return process.env.MONGO_DB_URL || "";
+    }
+
+    static get DB_NAME() {
+        return "vue-dashboard";
+    }
 }
