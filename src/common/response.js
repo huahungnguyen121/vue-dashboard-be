@@ -26,6 +26,11 @@ export default class ResponseBuilder {
         return this;
     }
 
+    setMetadata(metadata) {
+        this._response._metadata = metadata;
+        return this;
+    }
+
     setHttpCookie(cookie) {
         this._response._httpCookie = cookie;
         return this;
@@ -45,6 +50,7 @@ class Response {
     _statusCode = 200;
     _message = "";
     _data;
+    _metadata;
     _httpCookie;
     _clearCookie;
     _cookieOptions = {
@@ -64,6 +70,7 @@ class Response {
         res.status(this._statusCode).send({
             message: this._message,
             data: this._data ?? undefined,
+            metadata: this._metadata ?? undefined,
         });
     }
 }

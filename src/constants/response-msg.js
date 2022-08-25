@@ -34,4 +34,12 @@ export default class ResponseMSG {
     static get USERNAME_EXISTED() {
         return "Username existed";
     }
+
+    static get SERVER_ERROR() {
+        return "Server error";
+    }
+
+    static get USER_NOT_EXIST() {
+        return "User does not exist";
+    }
 }

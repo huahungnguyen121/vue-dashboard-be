@@ -31,7 +31,7 @@ export default class App {
         this._port = AppConstants.PORT;
         this._corsOption = {
             origin: AppConstants.CLIENT_URLS,
-            methods: ["GET", "POST", "PUT", "DELETE"],
+            methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
             allowedHeaders: [
                 "Origin",
                 "X-Requested-With",

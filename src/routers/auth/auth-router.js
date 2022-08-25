@@ -1,7 +1,7 @@
 import ResponseBuilder from "../../common/response.js";
 import ResponseMSG from "../../constants/response-msg.js";
 import { verifyAccessToken } from "../../middlewares/local/verify-token-middleware.js";
-import AuthModel from "../../models/auth/auth-model.js";
+import UserModel from "../../models/user/user-model.js";
 import { generateAccessToken } from "../../utils/jwt.js";
 import BaseRouter from "../base/base-router.js";
 
@@ -15,7 +15,7 @@ export default class AuthRouter extends BaseRouter {
     initRouter() {
         this._router.post("/login", this.handleLogin);
         this._router.post("/register", this.handleRegister);
-        this._router.delete("/logout", verifyAccessToken, this.handleLogout);
+        this._router.delete("/logout", this.handleLogout);
     }
 
     async handleLogin(req, res) {
@@ -32,7 +32,10 @@ export default class AuthRouter extends BaseRouter {
         }
 
         try {
-            const [found, info] = await AuthModel.find({ username, password });
+            const [found, info] = await UserModel.findUser({
+                username,
+                password,
+            });
 
             if (found === null) {
                 return responseBuilder
@@ -59,6 +62,11 @@ export default class AuthRouter extends BaseRouter {
                 .send(res);
         } catch (err) {
             console.error(err);
+            return responseBuilder
+                .setStatusCode(500)
+                .setMessage(ResponseMSG.SERVER_ERROR)
+                .getResponse()
+                .send(res);
         }
     }
 
@@ -86,7 +94,10 @@ export default class AuthRouter extends BaseRouter {
         }
 
         try {
-            const createdUser = await AuthModel.create({ username, password });
+            const createdUser = await UserModel.createUser({
+                username,
+                password,
+            });
 
             if (createdUser === null) {
                 return responseBuilder
@@ -103,6 +114,11 @@ export default class AuthRouter extends BaseRouter {
                 .send(res);
         } catch (err) {
             console.error(err);
+            return responseBuilder
+                .setStatusCode(500)
+                .setMessage(ResponseMSG.SERVER_ERROR)
+                .getResponse()
+                .send(res);
         }
     }
 }
