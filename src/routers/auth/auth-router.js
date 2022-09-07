@@ -1,8 +1,7 @@
 import ResponseBuilder from "../../common/response.js";
 import ResponseMSG from "../../constants/response-msg.js";
-import { verifyAccessToken } from "../../middlewares/local/verify-token-middleware.js";
 import UserModel from "../../models/user/user-model.js";
-import { generateAccessToken } from "../../utils/jwt.js";
+import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
 import BaseRouter from "../base/base-router.js";
 
 export default class AuthRouter extends BaseRouter {
@@ -19,7 +18,7 @@ export default class AuthRouter extends BaseRouter {
     }
 
     async handleLogin(req, res) {
-        const { username, password } = req.body;
+        const { username, password, rememberMe } = req.body;
 
         const responseBuilder = new ResponseBuilder();
 
@@ -47,6 +46,10 @@ export default class AuthRouter extends BaseRouter {
 
             const accessToken = generateAccessToken({ username: info });
 
+            const refreshToken = rememberMe
+                ? generateRefreshToken({ username: info })
+                : undefined;
+
             const result = found
                 ? { status: 200, data: { message: ResponseMSG.OK } }
                 : {
@@ -54,10 +57,25 @@ export default class AuthRouter extends BaseRouter {
                       data: { message: ResponseMSG.WRONG_PASSWORD },
                   };
 
+            const cookies = [
+                {
+                    name: "access-token",
+                    value: accessToken,
+                },
+            ];
+
+            if (refreshToken) {
+                cookies.push({
+                    name: "refresh-token",
+                    value: refreshToken,
+                });
+            }
+
             return responseBuilder
                 .setStatusCode(result.status)
                 .setMessage(result.data.message)
-                .setHttpCookie(accessToken)
+                .clearCookie(refreshToken ? [] : ["refresh-token"])
+                .setHttpCookies(cookies)
                 .getResponse()
                 .send(res);
         } catch (err) {
@@ -73,7 +91,7 @@ export default class AuthRouter extends BaseRouter {
     handleLogout(req, res) {
         const responseBuilder = new ResponseBuilder();
         return responseBuilder
-            .clearCookie("access-token")
+            .clearCookie(["access-token", "refresh-token"])
             .setStatusCode(200)
             .setMessage(ResponseMSG.LOGOUT_SUCCESS)
             .getResponse()

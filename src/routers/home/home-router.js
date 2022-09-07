@@ -1,4 +1,4 @@
-import { verifyAccessToken } from "../../middlewares/local/verify-token-middleware.js";
+import ResponseBuilder from "../../common/response.js";
 import BaseRouter from "../base/base-router.js";
 
 export default class HomeRouter extends BaseRouter {
@@ -9,10 +9,14 @@ export default class HomeRouter extends BaseRouter {
     }
 
     initRouter() {
-        this._router.get("/", verifyAccessToken, this.handleGetHome);
+        this._router.get("/", this.handleGetHome);
     }
 
     handleGetHome(req, res) {
-        res.sendStatus(200);
+        return new ResponseBuilder()
+            .setStatusCode(200)
+            .setMessage("Backend for vue dashboard - v1.0")
+            .getResponse()
+            .send(res);
     }
 }

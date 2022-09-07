@@ -31,13 +31,17 @@ export default class ResponseBuilder {
         return this;
     }
 
-    setHttpCookie(cookie) {
-        this._response._httpCookie = cookie;
+    setHttpCookies(cookies) {
+        if (Array.isArray(cookies)) {
+            this._response._httpCookies = cookies;
+        }
         return this;
     }
 
-    clearCookie(cookieName) {
-        this._response._clearCookie = cookieName;
+    clearCookie(cookieNames) {
+        if (Array.isArray(cookieNames)) {
+            this._response._clearCookies = cookieNames;
+        }
         return this;
     }
 
@@ -51,8 +55,8 @@ class Response {
     _message = "";
     _data;
     _metadata;
-    _httpCookie;
-    _clearCookie;
+    _httpCookies;
+    _clearCookies;
     _cookieOptions = {
         maxAge: 365 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -60,13 +64,24 @@ class Response {
         secure: true,
     };
 
+    applyCookies(res) {
+        // clear cookies
+        if (this._clearCookies !== undefined) {
+            this._clearCookies.forEach((cookieName) => {
+                res.clearCookie(cookieName, this._cookieOptions);
+            });
+        }
+
+        // set http cookies
+        if (this._httpCookies !== undefined) {
+            this._httpCookies.forEach((cookie) => {
+                res.cookie(cookie.name, cookie.value, this._cookieOptions);
+            });
+        }
+    }
+
     send(res) {
-        if (this._httpCookie !== undefined) {
-            res.cookie("access-token", this._httpCookie, this._cookieOptions);
-        }
-        if (this._clearCookie) {
-            res.clearCookie(this._clearCookie, this._cookieOptions);
-        }
+        this.applyCookies(res);
         res.status(this._statusCode).send({
             message: this._message,
             data: this._data ?? undefined,

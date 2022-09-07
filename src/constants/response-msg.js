@@ -15,12 +15,12 @@ export default class ResponseMSG {
         return "OK";
     }
 
-    static get EXPIRED_ACCESS_TOKEN() {
-        return "Access token expired";
+    static get EXPIRED_TOKEN() {
+        return "Token expired";
     }
 
-    static get INVALID_ACCESS_TOKEN() {
-        return "Invalid access token";
+    static get INVALID_TOKEN() {
+        return "Invalid token";
     }
 
     static get LOGOUT_SUCCESS() {

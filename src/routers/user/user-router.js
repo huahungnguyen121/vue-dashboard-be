@@ -1,6 +1,6 @@
 import ResponseBuilder from "../../common/response.js";
 import ResponseMSG from "../../constants/response-msg.js";
-import { verifyAccessToken } from "../../middlewares/local/verify-token-middleware.js";
+import { verifyToken } from "../../middlewares/local/verify-token-middleware.js";
 import UserModel from "../../models/user/user-model.js";
 import BaseRouter from "../base/base-router.js";
 
@@ -12,9 +12,9 @@ export default class UserRouter extends BaseRouter {
     }
 
     initRouter() {
-        this._router.get("/", verifyAccessToken, this.handleGetUsers);
-        this._router.patch("/", verifyAccessToken, this.handleUpdate);
-        this._router.delete("/", verifyAccessToken, this.handleDelete);
+        this._router.get("/", verifyToken, this.handleGetUsers);
+        this._router.patch("/", verifyToken, this.handleUpdate);
+        this._router.delete("/", verifyToken, this.handleDelete);
     }
 
     async handleGetUsers(req, res) {
